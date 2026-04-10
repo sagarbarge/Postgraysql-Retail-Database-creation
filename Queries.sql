@@ -72,4 +72,35 @@ order by total_quantity desc
 limit 3;
 
 -- Store-wise total revenue
+select bd.store_id, bd.store_name, sum(quantity_ordered*sale_price) as revenue
+from branch_details bd 
+join sales_fact sf on bd.store_id = sf.store_id
+join order_product_mapping op on sf.order_id = op.order_id
+join product_info pi on op.product_id = pi.product_id
+group by bd.store_id, bd.store_name;
+
+-- Customers who never placed any order
+select ci.first_name, ci.last_name
+from customer_info ci 
+left join sales_fact sf on ci.customer_id = sf.customer_id
+where sf.order_id is null;
+
+-- Most profitable product (highest revenue)
+select op.product_id, pi.product_name, sum(op.quantity_ordered*sale_price) as total_profit
+from order_product_mapping op 
+join product_info pi on op.product_id = pi.product_id
+group by op.product_id, pi.product_name
+order by total_profit desc
+limit 1;
+
+-- Daily revenue trend
+select DATE(sf.order_date) as Day_Details, sum(op.quantity_ordered*pi.sale_price)
+from sales_fact sf 
+join order_product_mapping op on sf.order_id = op.order_id
+join product_info pi on op.product_id = pi.product_id
+group by Day_Details
+order by Day_Details;
+
+
+
 
