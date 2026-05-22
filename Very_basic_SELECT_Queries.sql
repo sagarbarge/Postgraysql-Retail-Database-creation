@@ -134,23 +134,34 @@ order by revenue DESC;
 
 -- Level 8 — Important Practice Questions
 -- 22. Find customers who never placed any order
-
-
-
-
+select ci.first_name, ci.last_name
+from customer_info as ci
+left join sales_fact as sf on sf.customer_id = ci.customer_id
+where sf.order_id is null;
 
 -- 23. Find products never ordered
-
-
-
-
-
+select pi.product_id, pi.product_name
+from product_info as pi
+left join order_product_mapping as op on op.product_id = pi.product_id
+where op.order_id is null;
 
 -- 24. Find month-wise sales
-
-
-
-
-
+select EXTRACT(month from sf.order_date) as month_name, sum(op.quantity_ordered * pi.sale_price)
+from sales_fact as sf 
+JOIN order_product_mapping as op on op.order_id = sf.order_id
+JOIN product_info as pi on pi.product_id = op.product_id
+GROUP by EXTRACT(month from sf.order_date) 
+order by month_name ASC;
 
 -- 25. Find highest selling product
+select pi.product_name, sum(op.quantity_ordered) as Selling
+from order_product_mapping as op 
+join product_info as pi on pi.product_id = op.product_id
+group by pi.product_name
+order by Selling DESC
+limit 1;
+
+-- -------------------------------------------------------------
+
+
+
